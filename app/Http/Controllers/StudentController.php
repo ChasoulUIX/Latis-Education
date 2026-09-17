@@ -8,7 +8,7 @@ class StudentController extends Controller
 {
     public function index()
     {
-        return response('Students Index');
+        return view('students.index');
     }
 
     public function data(Request $request)
