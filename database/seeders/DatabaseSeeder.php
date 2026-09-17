@@ -29,5 +29,7 @@ class DatabaseSeeder extends Seeder
                 'image' => null,
             ]
         );
+
+        $this->call(StudentSeeder::class);
     }
 }
