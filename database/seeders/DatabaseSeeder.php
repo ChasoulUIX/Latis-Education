@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Institution;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,11 +17,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        Institution::firstOrCreate(['name' => 'Latis Education']);
+        Institution::firstOrCreate(['name' => 'Tutor Indonesia']);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@latis.com'],
+            [
+                'name' => 'Kandidat Admin',
+                'password' => Hash::make('password123'),
+                'position' => 'Fullstack Developer',
+                'image' => null,
+            ]
+        );
     }
 }
