@@ -200,6 +200,12 @@ class StudentController extends Controller
 
     public function export(Request $request)
     {
-        return response('Exported');
+        $institutionId = $request->query('institution_id');
+        $search = $request->query('search');
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\StudentsExport($institutionId, $search),
+            'data-siswa.xlsx'
+        );
     }
 }
