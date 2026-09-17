@@ -106,7 +106,7 @@
     <div class="flex-1 md:pl-64 flex flex-col min-h-screen">
         @include('layouts.navbar')
 
-        <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 w-full space-y-6">
             <!-- Global Flash Messages -->
             @if (session('success'))
                 <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between shadow-sm animate-fade-in">
