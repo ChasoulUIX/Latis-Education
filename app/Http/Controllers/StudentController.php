@@ -21,7 +21,12 @@ class StudentController extends Controller
         // Prepared statement query to fetch institutions for the filter dropdown
         $institutions = DB::select('SELECT id, name FROM institutions ORDER BY name ASC');
 
-        return view('students.index', compact('institutions'));
+        // Total stats for dashboard KPI overview cards
+        $totalStudents = DB::scalar('SELECT COUNT(*) FROM students');
+        $latisCount = DB::scalar("SELECT COUNT(s.id) FROM students s JOIN institutions i ON s.institution_id = i.id WHERE i.name LIKE '%Latis%'");
+        $tutorCount = DB::scalar("SELECT COUNT(s.id) FROM students s JOIN institutions i ON s.institution_id = i.id WHERE i.name LIKE '%Tutor%'");
+
+        return view('students.index', compact('institutions', 'totalStudents', 'latisCount', 'tutorCount'));
     }
 
     public function data(Request $request): JsonResponse
