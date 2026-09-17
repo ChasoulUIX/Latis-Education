@@ -6,6 +6,7 @@ use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
 use App\Models\Institution;
 use App\Models\Student;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,10 +23,87 @@ class StudentController extends Controller
         return view('students.index', compact('institutions'));
     }
 
-    public function data(Request $request)
+    public function data(Request $request): JsonResponse
     {
-        // We will build full DataTables AJAX response in Task 5
-        return response()->json(['data' => []]);
+        $institutionId = $request->query('institution_id');
+
+        // Handle search keyword from either custom param or DataTables default
+        $search = $request->query('search');
+        if (is_array($search)) {
+            $search = $search['value'] ?? null;
+        }
+
+        $sql = 'SELECT s.id, s.institution_id, s.nis, s.name, s.email, s.photo, s.created_at, i.name as institution_name
+                FROM students s
+                JOIN institutions i ON s.institution_id = i.id
+                WHERE 1=1';
+        $bindings = [];
+
+        if (!empty($institutionId)) {
+            $sql .= ' AND s.institution_id = ?';
+            $bindings[] = $institutionId;
+        }
+
+        if (!empty($search)) {
+            // Strictly search only on NIS & Name
+            $sql .= ' AND (s.nis LIKE ? OR s.name LIKE ?)';
+            $bindings[] = '%' . $search . '%';
+            $bindings[] = '%' . $search . '%';
+        }
+
+        $sql .= ' ORDER BY s.created_at DESC';
+
+        // Execute prepared statement
+        $students = DB::select($sql, $bindings);
+
+        $data = [];
+        $no = 1;
+        foreach ($students as $student) {
+            $photoUrl = $student->photo
+                ? asset('storage/' . $student->photo)
+                : null;
+
+            $editUrl = route('students.edit', $student->id);
+            $deleteUrl = route('students.destroy', $student->id);
+            $csrf = csrf_token();
+
+            $actions = '
+                <div class="flex items-center gap-2">
+                    <a href="' . $editUrl . '" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        Edit
+                    </a>
+                    <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus data siswa ini?\')" class="inline">
+                        <input type="hidden" name="_token" value="' . $csrf . '">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-rose-700 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            Hapus
+                        </button>
+                    </form>
+                </div>
+            ';
+
+            $data[] = [
+                'no' => $no++,
+                'id' => $student->id,
+                'nis' => $student->nis,
+                'name' => $student->name,
+                'email' => $student->email,
+                'institution_name' => $student->institution_name,
+                'institution_id' => $student->institution_id,
+                'photo' => $student->photo,
+                'photo_url' => $photoUrl,
+                'actions' => $actions,
+            ];
+        }
+
+        return response()->json([
+            'draw' => (int) $request->query('draw', 1),
+            'recordsTotal' => count($data),
+            'recordsFiltered' => count($data),
+            'data' => $data,
+        ]);
     }
 
     public function create(): View
@@ -44,7 +122,7 @@ class StudentController extends Controller
             $photoPath = $request->file('photo')->store('students', 'public');
         }
 
-        // Use Prepared Statement via Query Builder / Eloquent binding
+        // Prepared Statement via DB::insert
         DB::transaction(function () use ($validated, $photoPath) {
             DB::insert(
                 'INSERT INTO students (institution_id, nis, name, email, photo, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -84,7 +162,7 @@ class StudentController extends Controller
             $photoPath = $request->file('photo')->store('students', 'public');
         }
 
-        // Use Prepared Statement
+        // Prepared Statement via DB::update
         DB::transaction(function () use ($validated, $photoPath, $student) {
             DB::update(
                 'UPDATE students SET institution_id = ?, nis = ?, name = ?, email = ?, photo = ?, updated_at = ? WHERE id = ?',
