@@ -6,6 +6,7 @@ use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
 use App\Models\Institution;
 use App\Models\Student;
+use App\Services\ImageCompressor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -119,7 +120,7 @@ class StudentController extends Controller
 
         $photoPath = null;
         if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('students', 'public');
+            $photoPath = ImageCompressor::compressAndStore($request->file('photo'), 'students', 'public');
         }
 
         // Prepared Statement via DB::insert
@@ -159,7 +160,7 @@ class StudentController extends Controller
             if ($photoPath && Storage::disk('public')->exists($photoPath)) {
                 Storage::disk('public')->delete($photoPath);
             }
-            $photoPath = $request->file('photo')->store('students', 'public');
+            $photoPath = ImageCompressor::compressAndStore($request->file('photo'), 'students', 'public');
         }
 
         // Prepared Statement via DB::update

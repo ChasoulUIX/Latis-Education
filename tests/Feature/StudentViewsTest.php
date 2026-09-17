@@ -32,7 +32,7 @@ class StudentViewsTest extends TestCase
         $response->assertSee('Tambah Data Siswa');
         $response->assertSee('Latis Education');
         $response->assertSee('Tutor Indonesia');
-        $response->assertSee('Maksimal 100KB');
+        $response->assertSee('100KB');
     }
 
     public function test_edit_view_renders_existing_student_data(): void

@@ -87,10 +87,10 @@
                 @enderror
             </div>
 
-            <!-- Foto Siswa (JPG, PNG, Max 100KB) -->
+            <!-- Foto Siswa (JPG, PNG, Auto-compress <= 100KB) -->
             <div>
                 <label for="photo" class="block text-sm font-semibold text-slate-800 mb-1.5">
-                    Foto Siswa <span class="text-xs font-normal text-slate-500">(Opsional / Format JPG &amp; PNG, Maksimal 100KB)</span>
+                    Foto Siswa <span class="text-xs font-normal text-slate-500">(Opsional / Format JPG &amp; PNG. Jika &gt; 100KB akan otomatis dikompres)</span>
                 </label>
 
                 <div class="mt-2 flex items-center gap-4">
@@ -103,7 +103,7 @@
                     <div class="flex-1">
                         <input type="file" id="photo" name="photo" accept=".jpg,.jpeg,.png"
                                class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-                        <p id="file-size-feedback" class="text-xs text-slate-500 mt-1">Ukuran file maksimal: 100KB. Format: .jpg, .png</p>
+                        <p id="file-size-feedback" class="text-xs text-slate-500 mt-1">Sistem otomatis mengompres foto hingga &le; 100KB. Format: .jpg, .png</p>
                     </div>
                 </div>
                 @error('photo')

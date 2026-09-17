@@ -18,7 +18,7 @@ class StoreStudentRequest extends FormRequest
             'nis' => ['required', 'numeric', 'unique:students,nis'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
-            'photo' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:100'],
+            'photo' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:10240'],
         ];
     }
 
@@ -34,7 +34,7 @@ class StoreStudentRequest extends FormRequest
             'email.required' => 'Email siswa wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'photo.mimes' => 'Format foto yang diizinkan hanya JPG dan PNG.',
-            'photo.max' => 'Ukuran foto maksimal adalah 100KB.',
+            'photo.max' => 'Ukuran file foto sebelum dikompres maksimal 10MB.',
         ];
     }
 }

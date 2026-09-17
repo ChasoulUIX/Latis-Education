@@ -81,20 +81,39 @@ class StudentCrudTest extends TestCase
         $responseNonNumeric->assertSessionHasErrors(['nis']);
     }
 
-    public function test_photo_must_be_jpg_or_png_and_max_100kb(): void
+    public function test_photo_auto_compresses_when_exceeding_100kb(): void
     {
         Storage::fake('public');
 
-        // Size > 100KB (150KB)
-        $oversizedFile = UploadedFile::fake()->image('large.jpg')->size(150);
-        $responseOversize = $this->actingAs($this->user)->post('/students', [
+        // Size > 100KB (e.g. 500KB image)
+        $largeFile = UploadedFile::fake()->image('large.jpg', 800, 800)->size(500);
+
+        $response = $this->actingAs($this->user)->post('/students', [
             'institution_id' => $this->institution1->id,
             'nis' => '10002',
-            'name' => 'Oversized Photo Student',
-            'email' => 'oversize@example.com',
-            'photo' => $oversizedFile,
+            'name' => 'Auto Compressed Photo Student',
+            'email' => 'compress@example.com',
+            'photo' => $largeFile,
         ]);
-        $responseOversize->assertSessionHasErrors(['photo']);
+
+        $response->assertRedirect('/students');
+        $this->assertDatabaseHas('students', [
+            'nis' => '10002',
+            'name' => 'Auto Compressed Photo Student',
+        ]);
+
+        $student = Student::where('nis', '10002')->first();
+        $this->assertNotNull($student->photo);
+        Storage::disk('public')->assertExists($student->photo);
+
+        // Stored file must be <= 100KB (102400 bytes)
+        $storedSize = Storage::disk('public')->size($student->photo);
+        $this->assertLessThanOrEqual(100 * 1024, $storedSize);
+    }
+
+    public function test_photo_format_must_be_jpg_or_png(): void
+    {
+        Storage::fake('public');
 
         // Invalid format (PDF)
         $invalidFile = UploadedFile::fake()->create('doc.pdf', 50, 'application/pdf');
