@@ -98,9 +98,9 @@
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/></svg>
                             </div>
-                            <input id="email" name="email" type="email" autocomplete="email" required value="{{ old('email', 'admin@latis.com') }}"
+                            <input id="email" name="email" type="email" autocomplete="email" required value="{{ old('email') }}"
                                    class="w-full pl-11 pr-4 py-3 bg-slate-950/70 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-inner"
-                                   placeholder="admin@latis.com">
+                                   placeholder="Masukkan alamat email">
                         </div>
                     </div>
 
@@ -111,9 +111,8 @@
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                             </div>
                             <input id="password" name="password" type="password" autocomplete="current-password" required
-                                   value="password123"
                                    class="w-full pl-11 pr-4 py-3 bg-slate-950/70 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-inner"
-                                   placeholder="••••••••">
+                                   placeholder="Masukkan password">
                         </div>
                     </div>
 
